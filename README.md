@@ -59,6 +59,9 @@ python main.py --input-method manual
 # Wprowadzanie danych z plików
 python main.py --input-method file --row-clues-file row_clues.txt --col-clues-file col_clues.txt
 
+#Algorytm Brute force
+python main.py --input-method file --row-clues-file row_clues.txt --col-clues-file col_clues.txt --algorithm brute_force
+
 # Algorytmy optymalizacyjne
 python main.py --input-method file --row-clues-file row_clues.txt --col-clues-file col_clues.txt --algorithm hill_climbing
 python main.py --input-method file --row-clues-file row_clues.txt --col-clues-file col_clues.txt --algorithm tabu_search
