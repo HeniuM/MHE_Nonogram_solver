@@ -1,7 +1,4 @@
 def input_nonogram():
-    """
-    Pobiera dane od użytkownika dotyczące rozmiaru nonogramu oraz wskazówek.
-    """
     sizes = [5, 10, 15, 20, 25, 30]
     print("Wybierz rozmiar nonogramu:")
     for i, size in enumerate(sizes):
@@ -19,7 +16,6 @@ def input_nonogram():
     for i in range(size):
         while True:
             try:
-                # Usuwamy nieoczekiwane znaki i wprowadzamy tylko liczby
                 input_str = input(f"Rząd {i + 1}: ").replace(',', ' ').replace("'", '').strip()
                 clues = list(map(int, input_str.split()))
                 if not clues:
@@ -33,7 +29,6 @@ def input_nonogram():
     for i in range(size):
         while True:
             try:
-                # Usuwamy nieoczekiwane znaki i wprowadzamy tylko liczby
                 input_str = input(f"Kolumna {i + 1}: ").replace(',', ' ').replace("'", '').strip()
                 clues = list(map(int, input_str.split()))
                 if not clues:

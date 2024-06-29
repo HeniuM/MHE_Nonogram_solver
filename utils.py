@@ -1,9 +1,4 @@
-# utils.py
-
 def generate_possible_sequences(clues, length):
-    """
-    Generuje wszystkie możliwe sekwencje dla podanych wskazówek i długości wiersza/kolumny.
-    """
     if not clues:
         return [[0] * length]
 
@@ -27,13 +22,8 @@ def generate_possible_sequences(clues, length):
 
 
 def is_valid_sequence(grid, sequence, index, is_row):
-    """
-    Sprawdza, czy dana sekwencja jest zgodna z aktualnym stanem rzędu lub kolumny.
-    """
     line = grid[index] if is_row else [grid[i][index] for i in range(len(grid))]
     for i in range(len(line)):
         if line[i] != -1 and line[i] != int(sequence[i]):
-            print(f"Niepoprawna sekwencja: {sequence} dla {'rzędu' if is_row else 'kolumny'} {index + 1}")
-            print(f"Stan siatki: {line}")
             return False
     return True

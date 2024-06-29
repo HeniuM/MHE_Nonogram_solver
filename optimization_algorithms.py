@@ -1,22 +1,21 @@
-import sys
 import random
 import numpy as np
 
 
 def generate_sequences(clues, length):
     if not clues:
-        return [['0'] * length]
+        return [[0] * length]
 
     sequences = []
     first_clue = clues[0]
     for start in range(length - first_clue + 1):
-        prefix = ['0'] * start + ['1'] * first_clue
+        prefix = [0] * start + [1] * first_clue
         remaining_length = length - len(prefix)
         if len(clues) == 1:
-            suffixes = [['0'] * remaining_length]
+            suffixes = [[0] * remaining_length]
         else:
             suffixes = generate_sequences(clues[1:], remaining_length - 1)
-            suffixes = [['0'] + suffix for suffix in suffixes]
+            suffixes = [[0] + suffix for suffix in suffixes]
         for suffix in suffixes:
             sequences.append(prefix + suffix)
     return sequences
@@ -55,8 +54,12 @@ def hill_climbing(row_clues, col_clues):
                     neighbor = solution[:]
                     neighbor[row_idx] = sequence
                     neighbors.append(neighbor)
-        best_neighbor = max(neighbors, key=lambda s: fitness(s, row_clues, col_clues))
-        best_fitness = fitness(best_neighbor, row_clues, col_clues)
+        best_neighbor = neighbors[0]
+        best_fitness = fitness(neighbor, row_clues, col_clues)
+        for neighbor in neighbors:
+            if fitness(neighbor, row_clues, col_clues) > best_fitness:
+                best_neighbor = neighbor
+                best_fitness = fitness(neighbor, row_clues, col_clues)
         if best_fitness <= current_fitness:
             break
         solution, current_fitness = best_neighbor, best_fitness
@@ -80,8 +83,12 @@ def tabu_search(row_clues, col_clues, tabu_tenure=5, max_iterations=100):
                     if neighbor not in tabu_list:
                         neighbors.append(neighbor)
 
-        best_neighbor = max(neighbors, key=lambda s: fitness(s, row_clues, col_clues), default=solution)
+        best_neighbor = neighbors[0]
         best_neighbor_fitness = fitness(best_neighbor, row_clues, col_clues)
+        for neighbor in neighbors:
+            if fitness(neighbor, row_clues, col_clues) > best_neighbor_fitness:
+                best_neighbor = neighbor
+                best_neighbor_fitness = fitness(neighbor, row_clues, col_clues)
 
         if best_neighbor_fitness > best_fitness:
             best_solution = best_neighbor[:]
@@ -110,7 +117,8 @@ def simulated_annealing(row_clues, col_clues, initial_temp=100, cooling_rate=0.9
         neighbor[row_idx] = sequence
         neighbor_fitness = fitness(neighbor, row_clues, col_clues)
 
-        if neighbor_fitness > current_fitness or random.random() < np.exp((neighbor_fitness - current_fitness) / temperature):
+        if neighbor_fitness > current_fitness or random.random() < np.exp(
+                (neighbor_fitness - current_fitness) / temperature):
             solution = neighbor[:]
             current_fitness = neighbor_fitness
 
@@ -123,32 +131,14 @@ def simulated_annealing(row_clues, col_clues, initial_temp=100, cooling_rate=0.9
     return best_solution
 
 
-def parse_clues(file_path):
-    with open(file_path, 'r') as file:
-        return [list(map(int, line.strip().split())) for line in file]
+def run_optimization_algorithms(row_clues, col_clues):
+    print("Running Hill Climbing Algorithm...")
+    hc_solution = hill_climbing(row_clues, col_clues)
 
+    print("Running Tabu Search Algorithm...")
+    ts_solution = tabu_search(row_clues, col_clues)
 
-if __name__ == "__main__":
-    if len(sys.argv) != 4:
-        print("Usage: python optimization_algorithms.py <algorithm> <row_clues_file> <col_clues_file>")
-        sys.exit(1)
+    print("Running Simulated Annealing Algorithm...")
+    sa_solution = simulated_annealing(row_clues, col_clues)
 
-    algorithm = sys.argv[1]
-    row_clues_file = sys.argv[2]
-    col_clues_file = sys.argv[3]
-
-    row_clues = parse_clues(row_clues_file)
-    col_clues = parse_clues(col_clues_file)
-
-    if algorithm == "hill_climbing":
-        solution = hill_climbing(row_clues, col_clues)
-    elif algorithm == "tabu_search":
-        solution = tabu_search(row_clues, col_clues)
-    elif algorithm == "simulated_annealing":
-        solution = simulated_annealing(row_clues, col_clues)
-    else:
-        print(f"Unknown algorithm: {algorithm}")
-        sys.exit(1)
-
-    for row in solution:
-        print(''.join(row))
+    return hc_solution, ts_solution, sa_solution
